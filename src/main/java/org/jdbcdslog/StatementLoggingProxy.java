@@ -32,6 +32,13 @@ public class StatementLoggingProxy implements InvocationHandler {
 		try {
 			boolean toLog = (StatementLogger.isInfoEnabled()
 					|| SlowQueryLogger.isInfoEnabled()) && executeMethods.contains(method.getName());
+			if(!ConfigurationParameters.logSelect && toLog && args != null 
+					&& (((String)args[0]).trim().toLowerCase().startsWith("select"))) {
+				toLog = false;
+			}
+			if(!ConfigurationParameters.logSelect && toLog && "executeQuery".equals(method.getName())) {
+				toLog = false;
+			}
 			long t1 = 0;
 			if(toLog)
 				t1 = System.currentTimeMillis();
@@ -42,7 +49,12 @@ public class StatementLoggingProxy implements InvocationHandler {
 				long t2 = System.currentTimeMillis();
 				StringBuffer sb = LogUtils.createLogEntry(method, args == null ? null : args[0], null, null);
 				long time = t2 - t1;
-				String logEntry = sb.append(" ").append(time).append(" ms.").toString();
+				if(ConfigurationParameters.logTime) {
+					sb.append(" ").append(time).append(" ms.").toString();
+				}
+				sb.append(" connection id ").append(((Statement)targetStatement).getConnection().hashCode());
+				sb.append(" statement id ").append(targetStatement.hashCode());
+				String logEntry = sb.toString();
 				StatementLogger.info(logEntry);
 				if(time >= ConfigurationParameters.slowQueryThreshold)
 					SlowQueryLogger.info(logEntry);

@@ -23,6 +23,17 @@ public class ResultSetLoggingProxy  implements InvocationHandler {
 			throws Throwable {
 		Object r = null;
 		try {
+			if("equals".equals(method.getName())) {
+				ResultSet other = null;
+				if(args[0] != null && args[0] instanceof ResultSet) {
+					other = (ResultSet)((ResultSetLoggingProxy)Proxy.getInvocationHandler(args[0])).target;
+				}
+				boolean result = target.equals(other);
+				return (Object)Boolean.valueOf(result);
+			} else if("hashCode".equals(method.getName())) {
+				int result = target.hashCode();
+				return (Object) new Integer(result);
+			}
 			r = method.invoke(target, args);
 		} catch(Throwable e) {
 			LogUtils.handleException(e, ResultSetLogger.getLogger(), LogUtils.createLogEntry(method, null, null, null));

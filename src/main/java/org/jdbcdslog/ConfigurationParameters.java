@@ -17,6 +17,14 @@ public class ConfigurationParameters {
 	
 	static boolean logText = false;
 	
+	static boolean noCommit = false;
+	
+	static boolean logTime = true;
+	
+	static boolean printMethodName = true;
+	
+	static boolean logSelect = true;
+	
 	static {
 		ClassLoader loader = ConfigurationParameters.class.getClassLoader();
 		InputStream in = null;
@@ -34,9 +42,22 @@ public class ConfigurationParameters {
 			if("true".equalsIgnoreCase(sLogText))
 				logText = true;
 			String sprintStackTrace = props.getProperty("jdbcdslog.printStackTrace");
-			if("true".equalsIgnoreCase(sprintStackTrace))
-				printStackTrace = true;
-		} catch(Exception e) {
+			if("false".equalsIgnoreCase(sprintStackTrace))
+				printStackTrace = false;
+			String snoCommit = props.getProperty("jdbcdslog.noCommit");
+			if("true".equalsIgnoreCase(snoCommit))
+				noCommit = true;
+			String slogTime = props.getProperty("jdbcdslog.logTime");
+			if("false".equalsIgnoreCase(slogTime))
+				logTime = false;
+			String sprintMethodName = props.getProperty("jdbcdslog.printMethodName");
+			if("false".equalsIgnoreCase(sprintMethodName))
+				printMethodName = false;
+			String slogSelect = props.getProperty("jdbcdslog.logSelect");
+			if("false".equalsIgnoreCase(slogSelect))
+				logSelect = false;
+		} catch(
+				Exception e) {
 			logger.error(e.getMessage(), e);
 		} finally {
 			if(in != null)

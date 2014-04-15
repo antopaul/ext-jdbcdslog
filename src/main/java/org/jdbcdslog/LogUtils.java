@@ -31,9 +31,12 @@ public class LogUtils {
 	public static StringBuffer createLogEntry(Method method, Object sql, String parameters, String namedParameters) {
 		String methodName = "createLogEntry() ";
 		if(logger.isDebugEnabled()) logger.debug(methodName);
-		StringBuffer s = new StringBuffer(method.getDeclaringClass().getName())
-		.append(".").append(method.getName());
-		s.append(" ");
+		StringBuffer s = new StringBuffer();
+		if(ConfigurationParameters.printMethodName) {
+			s.append(method.getDeclaringClass().getName())
+			.append(".").append(method.getName());
+			s.append(" ");
+		}
 		if(sql != null)
 			s.append(sql);
 		if(parameters != null) {

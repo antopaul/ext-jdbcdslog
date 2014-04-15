@@ -40,9 +40,49 @@ public class GenericLoggingProxy implements InvocationHandler  {
 	
 	public Object invoke(Object proxy, Method method, Object[] args)
 			throws Throwable {
-		
+		Object r = null;
 		try { 
-			Object r = method.invoke(target, args);
+			if(proxy instanceof Connection && ConfigurationParameters.noCommit && method.getName().equals("commit")) {
+				if(ConnectionLogger.isInfoEnabled()) {
+					ConnectionLogger.info("Skipping commit - noCommit is set for connection id " 
+							+ ((Connection)proxy).hashCode());
+				}
+			} else {
+				r = method.invoke(target, args);
+				if(r instanceof Connection) {
+					if(method.getName().equals("unwrap")) {
+						if(ConnectionLogger.isInfoEnabled()) {
+							ConnectionLogger.info("Returning unwrapped connection");
+						}
+						return r;
+					} else if(method.getName().equals("commit") 
+							|| method.getName().equals("rollback")) {
+						if(ConnectionLogger.isInfoEnabled()) {
+							ConnectionLogger.info(method.getName() + " for connection id " 
+									+ ((Connection)proxy).hashCode());
+						}
+					} else if(method.getName().equals("setAutoCommit")) {
+						if(ConnectionLogger.isInfoEnabled()) {
+							ConnectionLogger.info("setAutoCommit " + args[0] + " for connection id " 
+									+ ((Connection)proxy).hashCode());
+						}
+					}
+				}
+				if(proxy instanceof Connection) {
+					if(method.getName().equals("commit") 
+							|| method.getName().equals("rollback")) {
+						if(ConnectionLogger.isInfoEnabled()) {
+							ConnectionLogger.info(method.getName() + " for connection id " 
+									+ ((Connection)proxy).hashCode());
+						}
+					} else if(method.getName().equals("setAutoCommit")) {
+						if(ConnectionLogger.isInfoEnabled()) {
+							ConnectionLogger.info("setAutoCommit " + args[0] + " for connection id " 
+									+ ((Connection)proxy).hashCode());
+						}
+					}
+				}
+			}
 			if(method.getName().equals("prepareCall") || method.getName().equals("prepareStatement"))
 				r = wrap(r, (String)args[0]);
 			else 
@@ -60,7 +100,8 @@ public class GenericLoggingProxy implements InvocationHandler  {
 			Connection con = (Connection)r;
 			if(ConnectionLogger.isInfoEnabled())
 				ConnectionLogger.info("connect to URL " + con.getMetaData().getURL() + " for user " 
-						+ con.getMetaData().getUserName());
+						+ con.getMetaData().getUserName() + " for connection id " 
+						+ ((Connection)r).hashCode());
 			return wrapByGenericProxy(r, Connection.class, sql);
 		}
 		if(r instanceof CallableStatement)

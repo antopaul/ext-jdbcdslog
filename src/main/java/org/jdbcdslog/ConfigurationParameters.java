@@ -19,6 +19,8 @@ public class ConfigurationParameters {
 	
 	static boolean noCommit = false;
 	
+	static boolean rollbackOnClose = false;
+	
 	static boolean logTime = true;
 	
 	static boolean printMethodName = true;
@@ -47,6 +49,9 @@ public class ConfigurationParameters {
 			String snoCommit = props.getProperty("jdbcdslog.noCommit");
 			if("true".equalsIgnoreCase(snoCommit))
 				noCommit = true;
+			String srollbackOnClose = props.getProperty("jdbcdslog.rollbackOnClose");
+			if("true".equalsIgnoreCase(srollbackOnClose))
+				rollbackOnClose = true;
 			String slogTime = props.getProperty("jdbcdslog.logTime");
 			if("false".equalsIgnoreCase(slogTime))
 				logTime = false;

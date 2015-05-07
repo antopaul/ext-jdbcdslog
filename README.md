@@ -21,7 +21,7 @@ Fork of jdbcdslog(http://code.google.com/p/jdbcdslog/) with more configuration o
 
 4. jdbcdslog.printMethodName - Do not print method name of calling method.
 
-##TODO##
-1. Add option to rollback connection on closing connection. Oracle commits connection on close when in non auto commit mode.
+5. jdbcdslog.jdbcdslog.rollbackOnClose - Call Connection.rollback() if this option is true. Oracle commits connection on close when in non auto commit mode.
 
-2. Call rollback on connection if in noCommit mode.
+##TODO##
+1. Call rollback on connection if in noCommit mode.

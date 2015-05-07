@@ -48,6 +48,15 @@ public class GenericLoggingProxy implements InvocationHandler  {
 							+ ((Connection)proxy).hashCode());
 				}
 			} else {
+			    if(proxy instanceof Connection && ConfigurationParameters.rollbackOnClose 
+			            && method.getName().equals("close")) {
+    				if(ConnectionLogger.isInfoEnabled()) {
+    					ConnectionLogger.info("Rolling back - rollbackOnClose is set for connection id " 
+    							+ ((Connection)proxy).hashCode());
+    				}
+    				((Connection)target).rollback();
+    				
+    			}
 				r = method.invoke(target, args);
 				if(r instanceof Connection) {
 					if(method.getName().equals("unwrap")) {
